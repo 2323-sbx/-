@@ -376,9 +376,13 @@
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            console.log('Canvas resized to:', canvas.width, 'x', canvas.height);
         }
         resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            currentTextParticles = [];
+        });
         
         const colorPalettes = [
             {colors: ['#FFD700', '#FFA500', '#FF6347']},
@@ -796,14 +800,19 @@
         function createTextParticles(text) {
             currentTextParticles = [];
             let fontSize;
-            if (canvas.width < 320) {
-                fontSize = 35;
-            } else if (canvas.width < 480) {
-                fontSize = 45;
-            } else if (canvas.width < 640) {
-                fontSize = 60;
-            } else if (canvas.width < 768) {
-                fontSize = 70;
+            const screenWidth = canvas.width;
+            if (screenWidth < 320) {
+                fontSize = 28;
+            } else if (screenWidth < 375) {
+                fontSize = 36;
+            } else if (screenWidth < 414) {
+                fontSize = 42;
+            } else if (screenWidth < 480) {
+                fontSize = 48;
+            } else if (screenWidth < 640) {
+                fontSize = 55;
+            } else if (screenWidth < 768) {
+                fontSize = 65;
             } else {
                 fontSize = 120;
             }
