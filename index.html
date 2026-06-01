@@ -143,9 +143,12 @@
         }
         
         .restart-button {
-            margin-top: 60px;
-            padding: 15px 50px;
-            font-size: 24px;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            margin-top: 0;
+            padding: 12px 30px;
+            font-size: 18px;
             background: rgba(255,255,255,0.2);
             color: white;
             border: 2px solid rgba(255,255,255,0.5);
@@ -155,6 +158,7 @@
             letter-spacing: 3px;
             opacity: 0;
             backdrop-filter: blur(5px);
+            z-index: 200;
         }
         
         .restart-button.show {
@@ -164,6 +168,124 @@
         .restart-button:hover {
             transform: translateY(-2px);
             background: rgba(255,255,255,0.3);
+        }
+
+        .popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .popup-container.show {
+            display: flex;
+        }
+
+        .popup-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .popup {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 20px;
+            padding: 18px 24px;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 
+                0 8px 30px rgba(0, 0, 0, 0.12),
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            transform: scale(0.6) translateX(-20px);
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            pointer-events: auto;
+            position: relative;
+            overflow: hidden;
+            min-width: 110px;
+            max-width: 160px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .popup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b9d, #4facfe, #43e97b, #ff6b9d);
+            background-size: 300% 100%;
+            animation: shimmerBar 3s linear infinite;
+        }
+
+        @keyframes shimmerBar {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .popup::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .popup:hover {
+            transform: scale(1.05) translateX(0) !important;
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.18),
+                0 4px 12px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .popup:hover::after {
+            opacity: 1;
+        }
+
+        .popup.show {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+        }
+
+        .popup:nth-child(1) { background: linear-gradient(145deg, #ffeef8 0%, #ffd6e8 100%); }
+        .popup:nth-child(2) { background: linear-gradient(145deg, #f0f9ff 0%, #d6ecff 100%); }
+        .popup:nth-child(3) { background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%); }
+        .popup:nth-child(4) { background: linear-gradient(145deg, #fffbeb 0%, #fef3c7 100%); }
+        .popup:nth-child(5) { background: linear-gradient(145deg, #faf5ff 0%, #f3e8ff 100%); }
+        .popup:nth-child(6) { background: linear-gradient(145deg, #fef3c7 0%, #fde68a 100%); }
+
+        .popup-close-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            z-index: 101;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .popup-close-hint.show {
+            opacity: 1;
         }
     </style>
 </head>
@@ -191,6 +313,11 @@
                 <button class="restart-button" id="restartBtn" onclick="restartAnimation()">再看一次</button>
             </div>
         </div>
+
+        <div class="popup-container" id="popupContainer">
+        </div>
+
+        <div class="popup-close-hint" id="popupHint">点击弹窗或下方按钮关闭</div>
     </div>
     
     <audio id="bgMusic" loop>
@@ -206,6 +333,7 @@
     <script>
         let currentScreen = 1;
         let isMusicPlaying = false;
+        let popupsShown = false;
         const canvas = document.getElementById('fireworksCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -679,17 +807,25 @@
                     baseSize = 1;
                 } else if (canvas.width < 768) {
                     baseSize = 1.2;
-                } else {
+                } else if (canvas.width < 1920) {
                     baseSize = 1.5;
+                } else {
+                    baseSize = 2;
                 }
-                this.size = baseSize + Math.random() * 0.2;
+                this.size = baseSize + Math.random() * 0.3;
                 
                 this.alpha = 0;
                 this.targetAlpha = 1;
-                this.speed = 0.006 + Math.random() * 0.004;
+                let baseSpeed = 0.008;
+                if (canvas.width >= 1920) {
+                    baseSpeed = 0.012;
+                } else if (canvas.width >= 768) {
+                    baseSpeed = 0.01;
+                }
+                this.speed = baseSpeed + Math.random() * 0.004;
                 this.progress = 0;
                 this.wobble = Math.random() * Math.PI * 2;
-                this.wobbleSpeed = 0.01 + Math.random() * 0.01;
+                this.wobbleSpeed = 0.015 + Math.random() * 0.01;
                 this.settled = false;
                 this.settledTime = 0;
             }
@@ -724,10 +860,10 @@
             
             draw() {
                 if (this.alpha <= 0) return;
-                
+
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                
+
                 let fillColor = this.color;
                 if (this.color.startsWith('#')) {
                     const r = parseInt(this.color.slice(1, 3), 16);
@@ -735,19 +871,8 @@
                     const b = parseInt(this.color.slice(5, 7), 16);
                     fillColor = `rgba(${r}, ${g}, ${b}, ${this.alpha})`;
                 }
-                
+
                 ctx.fillStyle = fillColor;
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size * 1.5, 0, Math.PI * 2);
-                const glowGradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 1.5);
-                const r = parseInt(this.color.slice(1, 3), 16);
-                const g = parseInt(this.color.slice(3, 5), 16);
-                const b = parseInt(this.color.slice(5, 7), 16);
-                glowGradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${this.alpha * 0.3})`);
-                glowGradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
-                ctx.fillStyle = glowGradient;
                 ctx.fill();
             }
         }
@@ -797,11 +922,13 @@
             if (canvas.width < 375) {
                 gap = 1;
             } else if (canvas.width < 480) {
-                gap = 1;
-            } else if (canvas.width < 768) {
                 gap = 1.2;
-            } else {
+            } else if (canvas.width < 768) {
                 gap = 1.5;
+            } else if (canvas.width < 1920) {
+                gap = 2;
+            } else {
+                gap = 2.5;
             }
             
             for (let y = 0; y < canvas.height; y += gap) {
@@ -835,25 +962,36 @@
                 fontSize = 55;
             } else if (screenWidth < 768) {
                 fontSize = 65;
+            } else if (screenWidth < 1920) {
+                fontSize = 100;
             } else {
                 fontSize = 120;
             }
             const pixels = getTextPixels(text, fontSize);
-            
+
             const colors = ['#ffffff', '#e0e0e0', '#d0d0d0'];
-            
-            pixels.forEach((pixel, index) => {
+
+            const maxParticles = screenWidth < 480 ? 800 :
+                                  screenWidth < 768 ? 1200 :
+                                  screenWidth < 1920 ? 2000 : 3000;
+
+            const particleCount = Math.min(pixels.length, maxParticles);
+            const step = Math.max(1, Math.floor(pixels.length / particleCount));
+
+            for (let i = 0; i < pixels.length; i += step) {
+                const pixel = pixels[i];
+                const delay = Math.random() * 800;
                 setTimeout(() => {
                     const angle = Math.random() * Math.PI * 2;
-                    const distance = 400 + Math.random() * 300;
+                    const distance = 300 + Math.random() * 200;
                     const startX = pixel.x + Math.cos(angle) * distance;
                     const startY = pixel.y + Math.sin(angle) * distance;
-                    
+
                     const color = colors[Math.floor(Math.random() * colors.length)];
                     const particle = new TextParticle(pixel.x, pixel.y, startX, startY, color);
                     currentTextParticles.push(particle);
-                }, Math.random() * 1500);
-            });
+                }, delay);
+            }
         }
         
         function drawTextParticles() {
@@ -1050,15 +1188,140 @@
                     createTextParticles(msg.text);
                 }, msg.delay);
             });
-            
+
             setTimeout(() => {
                 document.getElementById('restartBtn').classList.add('show');
             }, 45000);
+
+            setTimeout(() => {
+                showCaringPopups();
+            }, 42000);
+        }
+
+        function showCaringPopups() {
+            if (popupsShown) return;
+            popupsShown = true;
+
+            const popupContainer = document.getElementById('popupContainer');
+            const popupHint = document.getElementById('popupHint');
+
+            const messages = [
+                "今天过得开心嘛",
+                "别太累啦，偶尔偷懒也好",
+                "记得好好护肤",
+                "天冷了，多穿衣服",
+                "珍惜每一刻",
+                "你超棒的",
+                "顺顺利利",
+                "好好爱自己",
+                "保持好心情",
+                "要相信自己奥",
+                "早点休息",
+                "记得吃水果",
+                "梦想成真",
+                "愿所有烦恼都消失",
+                "每天都要元气满满",
+                "多喝水哦~",
+                "学会爱自己，才能更好地爱别人"
+            ];
+
+            popupContainer.innerHTML = '';
+            popupContainer.classList.add('show');
+
+            const colors = [
+                'linear-gradient(145deg, #ffeef8 0%, #ffd6e8 100%)',
+                'linear-gradient(145deg, #f0f9ff 0%, #d6ecff 100%)',
+                'linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%)',
+                'linear-gradient(145deg, #fffbeb 0%, #fef3c7 100%)',
+                'linear-gradient(145deg, #faf5ff 0%, #f3e8ff 100%)',
+                'linear-gradient(145deg, #fef3c7 0%, #fde68a 100%)',
+                'linear-gradient(145deg, #fce7f3 0%, #fbcfe8 100%)',
+                'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)'
+            ];
+
+            const cakeLayers = [
+                { count: 2, spacing: 15 },
+                { count: 4, spacing: 12 },
+                { count: 5, spacing: 10 },
+                { count: 6, spacing: 8 }
+            ];
+
+            const baseDelay = 150;
+            let messageIndex = 0;
+            let totalDelay = 0;
+
+            const layerMessageCounts = cakeLayers.map(layer => layer.count);
+            let layerStartIndex = messages.length;
+
+            cakeLayers.forEach((layer, layerIndex) => {
+                const row = document.createElement('div');
+                row.className = 'popup-row';
+                popupContainer.appendChild(row);
+
+                layerStartIndex -= layer.count;
+                const layerStart = Math.max(0, layerStartIndex);
+
+                for (let i = 0; i < layer.count && (layerStart + i) < messages.length; i++) {
+                    const msg = messages[layerStart + i];
+                    const delay = totalDelay + i * baseDelay;
+                    const colorIndex = (layerStart + i) % colors.length;
+
+                    setTimeout(() => {
+                        const popup = document.createElement('div');
+                        popup.className = 'popup';
+                        popup.textContent = msg;
+                        popup.style.background = colors[colorIndex];
+
+                        popup.addEventListener('click', () => {
+                            popup.style.transform = 'scale(0) translateY(30px)';
+                            popup.style.opacity = '0';
+                            setTimeout(() => popup.remove(), 300);
+
+                            const remaining = document.querySelectorAll('.popup.show').length;
+                            if (remaining <= 1) {
+                                hidePopups();
+                            }
+                        });
+
+                        row.appendChild(popup);
+
+                        requestAnimationFrame(() => {
+                            popup.classList.add('show');
+                        });
+                    }, delay);
+                }
+                totalDelay += layer.count * baseDelay + 50;
+            });
+
+            setTimeout(() => {
+                popupHint.classList.add('show');
+            }, totalDelay + 500);
+        }
+
+        function hidePopups() {
+            const popupContainer = document.getElementById('popupContainer');
+            const popupHint = document.getElementById('popupHint');
+
+            popupHint.classList.remove('show');
+
+            document.querySelectorAll('.popup.show').forEach((popup, index) => {
+                setTimeout(() => {
+                    popup.style.transform = 'scale(0) translateY(30px)';
+                    popup.style.opacity = '0';
+                    setTimeout(() => popup.remove(), 300);
+                }, index * 80);
+            });
+
+            setTimeout(() => {
+                popupContainer.classList.remove('show');
+                popupsShown = false;
+            }, 1000);
         }
         
         function restartAnimation() {
             document.getElementById('restartBtn').classList.remove('show');
-            
+            hidePopups();
+
             fireworks = [];
             particles = [];
             currentTextParticles = [];
