@@ -272,6 +272,23 @@
         .popup:nth-child(5) { background: linear-gradient(145deg, #faf5ff 0%, #f3e8ff 100%); }
         .popup:nth-child(6) { background: linear-gradient(145deg, #fef3c7 0%, #fde68a 100%); }
 
+        /* 手机端适配 */
+        @media (max-width: 768px) {
+            .popup-row {
+                gap: 8px;
+                margin-bottom: 10px;
+                flex-wrap: wrap;
+                max-width: 95vw;
+            }
+            
+            .popup {
+                padding: 10px 14px;
+                font-size: 11px;
+                min-width: 70px;
+                max-width: 120px;
+            }
+        }
+
         .popup-close-hint {
             position: fixed;
             bottom: 30px;
@@ -951,17 +968,17 @@
             let fontSize;
             const screenWidth = canvas.width;
             if (screenWidth < 320) {
-                fontSize = 28;
+                fontSize = 32;
             } else if (screenWidth < 375) {
-                fontSize = 36;
+                fontSize = 40;
             } else if (screenWidth < 414) {
-                fontSize = 42;
+                fontSize = 46;
             } else if (screenWidth < 480) {
-                fontSize = 48;
+                fontSize = 52;
             } else if (screenWidth < 640) {
-                fontSize = 55;
+                fontSize = 60;
             } else if (screenWidth < 768) {
-                fontSize = 65;
+                fontSize = 70;
             } else if (screenWidth < 1920) {
                 fontSize = 100;
             } else {
@@ -971,19 +988,25 @@
 
             const colors = ['#ffffff', '#e0e0e0', '#d0d0d0'];
 
-            const maxParticles = screenWidth < 480 ? 800 :
-                                  screenWidth < 768 ? 1200 :
-                                  screenWidth < 1920 ? 2000 : 3000;
+            const maxParticles = screenWidth < 480 ? 1200 :
+                                  screenWidth < 768 ? 1800 :
+                                  screenWidth < 1920 ? 2500 : 3000;
 
-            const particleCount = Math.min(pixels.length, maxParticles);
-            const step = Math.max(1, Math.floor(pixels.length / particleCount));
+            // 确保至少有一些粒子
+            let particleCount = Math.min(pixels.length, maxParticles);
+            if (particleCount === 0 && pixels.length > 0) {
+                particleCount = pixels.length;
+            }
+
+            // 简单均匀采样
+            const step = particleCount > 0 ? Math.max(1, Math.floor(pixels.length / particleCount)) : 1;
 
             for (let i = 0; i < pixels.length; i += step) {
                 const pixel = pixels[i];
                 const delay = Math.random() * 800;
                 setTimeout(() => {
                     const angle = Math.random() * Math.PI * 2;
-                    const distance = 300 + Math.random() * 200;
+                    const distance = 200 + Math.random() * 150;
                     const startX = pixel.x + Math.cos(angle) * distance;
                     const startY = pixel.y + Math.sin(angle) * distance;
 
@@ -1239,32 +1262,40 @@
                 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)'
             ];
 
-            const cakeLayers = [
-                { count: 2, spacing: 15 },
-                { count: 4, spacing: 12 },
-                { count: 5, spacing: 10 },
-                { count: 6, spacing: 8 }
-            ];
+            const screenWidth = window.innerWidth;
+            const isMobile = screenWidth < 768;
 
-            const baseDelay = 150;
-            let messageIndex = 0;
+            // 根据屏幕大小设置蛋糕层数
+            let cakeLayers;
+            if (isMobile) {
+                cakeLayers = [
+                    { count: 3 },
+                    { count: 4 },
+                    { count: 5 },
+                    { count: 5 }
+                ];
+            } else {
+                cakeLayers = [
+                    { count: 2, spacing: 15 },
+                    { count: 4, spacing: 12 },
+                    { count: 5, spacing: 10 },
+                    { count: 6, spacing: 8 }
+                ];
+            }
+
+            const baseDelay = isMobile ? 120 : 150;
             let totalDelay = 0;
-
-            const layerMessageCounts = cakeLayers.map(layer => layer.count);
-            let layerStartIndex = messages.length;
+            let msgIdx = 0;
 
             cakeLayers.forEach((layer, layerIndex) => {
                 const row = document.createElement('div');
                 row.className = 'popup-row';
                 popupContainer.appendChild(row);
 
-                layerStartIndex -= layer.count;
-                const layerStart = Math.max(0, layerStartIndex);
-
-                for (let i = 0; i < layer.count && (layerStart + i) < messages.length; i++) {
-                    const msg = messages[layerStart + i];
+                for (let i = 0; i < layer.count && msgIdx < messages.length; i++) {
+                    const msg = messages[msgIdx];
                     const delay = totalDelay + i * baseDelay;
-                    const colorIndex = (layerStart + i) % colors.length;
+                    const colorIndex = msgIdx % colors.length;
 
                     setTimeout(() => {
                         const popup = document.createElement('div');
@@ -1289,6 +1320,8 @@
                             popup.classList.add('show');
                         });
                     }, delay);
+                    
+                    msgIdx++;
                 }
                 totalDelay += layer.count * baseDelay + 50;
             });
