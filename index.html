@@ -671,7 +671,19 @@
                 this.startX = startX;
                 this.startY = startY;
                 this.color = color;
-                this.size = 2 + Math.random() * 1.5;
+                
+                let baseSize;
+                if (canvas.width < 375) {
+                    baseSize = 3;
+                } else if (canvas.width < 480) {
+                    baseSize = 3.5;
+                } else if (canvas.width < 768) {
+                    baseSize = 4;
+                } else {
+                    baseSize = 4;
+                }
+                this.size = baseSize + Math.random() * 2;
+                
                 this.alpha = 0;
                 this.targetAlpha = 1;
                 this.speed = 0.006 + Math.random() * 0.004;
@@ -780,7 +792,17 @@
             const imageData = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
             const pixels = [];
             const data = imageData.data;
-            const gap = 4;
+            
+            let gap;
+            if (canvas.width < 375) {
+                gap = 2;
+            } else if (canvas.width < 480) {
+                gap = 2.5;
+            } else if (canvas.width < 768) {
+                gap = 3;
+            } else {
+                gap = 4;
+            }
             
             for (let y = 0; y < canvas.height; y += gap) {
                 for (let x = 0; x < canvas.width; x += gap) {
