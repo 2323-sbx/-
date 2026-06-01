@@ -180,6 +180,7 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            gap: 10px;
             z-index: 100;
             pointer-events: none;
         }
@@ -191,101 +192,54 @@
         .popup-row {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 15px;
+            gap: 10px;
         }
 
         .popup {
-            background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%);
-            border-radius: 20px;
-            padding: 18px 24px;
+            background: linear-gradient(145deg, #ffeef8 0%, #ffd6e8 100%);
+            border-radius: 15px;
+            padding: 12px 16px;
             color: #333;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            box-shadow: 
-                0 8px 30px rgba(0, 0, 0, 0.12),
-                0 2px 8px rgba(0, 0, 0, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
             opacity: 0;
-            transform: scale(0.6) translateX(-20px);
-            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: scale(0.5) translateY(-20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             pointer-events: auto;
             position: relative;
-            overflow: hidden;
-            min-width: 110px;
-            max-width: 160px;
+            min-width: 80px;
+            max-width: 140px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
-
-        .popup::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #ff6b9d, #4facfe, #43e97b, #ff6b9d);
-            background-size: 300% 100%;
-            animation: shimmerBar 3s linear infinite;
-        }
-
-        @keyframes shimmerBar {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-        }
-
-        .popup::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .popup:hover {
-            transform: scale(1.05) translateX(0) !important;
-            box-shadow: 
-                0 12px 40px rgba(0, 0, 0, 0.18),
-                0 4px 12px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9);
-        }
-
-        .popup:hover::after {
-            opacity: 1;
         }
 
         .popup.show {
             opacity: 1;
-            transform: scale(1) translateX(0);
+            transform: scale(1) translateY(0);
         }
 
-        .popup:nth-child(1) { background: linear-gradient(145deg, #ffeef8 0%, #ffd6e8 100%); }
-        .popup:nth-child(2) { background: linear-gradient(145deg, #f0f9ff 0%, #d6ecff 100%); }
-        .popup:nth-child(3) { background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%); }
-        .popup:nth-child(4) { background: linear-gradient(145deg, #fffbeb 0%, #fef3c7 100%); }
-        .popup:nth-child(5) { background: linear-gradient(145deg, #faf5ff 0%, #f3e8ff 100%); }
-        .popup:nth-child(6) { background: linear-gradient(145deg, #fef3c7 0%, #fde68a 100%); }
+        .popup:hover {
+            transform: scale(1.05) !important;
+        }
 
         /* 手机端适配 */
         @media (max-width: 768px) {
-            .popup-row {
+            .popup-container {
                 gap: 8px;
-                margin-bottom: 10px;
+            }
+            
+            .popup-row {
+                gap: 6px;
                 flex-wrap: wrap;
-                max-width: 95vw;
+                max-width: 92vw;
             }
             
             .popup {
-                padding: 10px 14px;
-                font-size: 11px;
-                min-width: 70px;
-                max-width: 120px;
+                padding: 8px 10px;
+                font-size: 10px;
+                min-width: 60px;
+                max-width: 100px;
             }
         }
 
@@ -925,8 +879,8 @@
             tempCanvas.width = canvas.width;
             tempCanvas.height = canvas.height;
             
-            tempCtx.font = `bold ${fontSize}px Microsoft YaHei`;
-            tempCtx.fillStyle = 'white';
+            tempCtx.font = `bold ${fontSize}px Microsoft YaHei, SimHei, sans-serif`;
+            tempCtx.fillStyle = '#ffffff';
             tempCtx.textAlign = 'center';
             tempCtx.textBaseline = 'middle';
             tempCtx.fillText(text, canvas.width / 2, canvas.height / 2);
@@ -935,23 +889,13 @@
             const pixels = [];
             const data = imageData.data;
             
-            let gap;
-            if (canvas.width < 375) {
-                gap = 1;
-            } else if (canvas.width < 480) {
-                gap = 1.2;
-            } else if (canvas.width < 768) {
-                gap = 1.5;
-            } else if (canvas.width < 1920) {
-                gap = 2;
-            } else {
-                gap = 2.5;
-            }
+            // 采样间隔 - 更小的间隔，更多粒子
+            let gap = canvas.width < 768 ? 1 : 2;
             
             for (let y = 0; y < canvas.height; y += gap) {
                 for (let x = 0; x < canvas.width; x += gap) {
                     const index = (y * canvas.width + x) * 4;
-                    if (data[index + 3] > 128) {
+                    if (data[index + 3] > 100) {
                         pixels.push({
                             x: x,
                             y: y
@@ -968,17 +912,17 @@
             let fontSize;
             const screenWidth = canvas.width;
             if (screenWidth < 320) {
-                fontSize = 32;
-            } else if (screenWidth < 375) {
                 fontSize = 40;
+            } else if (screenWidth < 375) {
+                fontSize = 48;
             } else if (screenWidth < 414) {
-                fontSize = 46;
+                fontSize = 54;
             } else if (screenWidth < 480) {
-                fontSize = 52;
-            } else if (screenWidth < 640) {
                 fontSize = 60;
-            } else if (screenWidth < 768) {
+            } else if (screenWidth < 640) {
                 fontSize = 70;
+            } else if (screenWidth < 768) {
+                fontSize = 80;
             } else if (screenWidth < 1920) {
                 fontSize = 100;
             } else {
@@ -986,27 +930,17 @@
             }
             const pixels = getTextPixels(text, fontSize);
 
-            const colors = ['#ffffff', '#e0e0e0', '#d0d0d0'];
+            const colors = ['#ffffff', '#f0f0f0', '#e0e0e0'];
 
-            const maxParticles = screenWidth < 480 ? 1200 :
-                                  screenWidth < 768 ? 1800 :
-                                  screenWidth < 1920 ? 2500 : 3000;
-
-            // 确保至少有一些粒子
-            let particleCount = Math.min(pixels.length, maxParticles);
-            if (particleCount === 0 && pixels.length > 0) {
-                particleCount = pixels.length;
-            }
-
-            // 简单均匀采样
-            const step = particleCount > 0 ? Math.max(1, Math.floor(pixels.length / particleCount)) : 1;
+            // 更宽松的采样，确保有足够粒子
+            const step = screenWidth < 768 ? 1 : 2;
 
             for (let i = 0; i < pixels.length; i += step) {
                 const pixel = pixels[i];
-                const delay = Math.random() * 800;
+                const delay = Math.random() * 600;
                 setTimeout(() => {
                     const angle = Math.random() * Math.PI * 2;
-                    const distance = 200 + Math.random() * 150;
+                    const distance = 150 + Math.random() * 100;
                     const startX = pixel.x + Math.cos(angle) * distance;
                     const startY = pixel.y + Math.sin(angle) * distance;
 
@@ -1268,43 +1202,40 @@
             // 根据屏幕大小设置蛋糕层数
             let cakeLayers;
             if (isMobile) {
-                cakeLayers = [
-                    { count: 3 },
-                    { count: 4 },
-                    { count: 5 },
-                    { count: 5 }
-                ];
+                cakeLayers = [3, 4, 5, 5];
             } else {
-                cakeLayers = [
-                    { count: 2, spacing: 15 },
-                    { count: 4, spacing: 12 },
-                    { count: 5, spacing: 10 },
-                    { count: 6, spacing: 8 }
-                ];
+                cakeLayers = [2, 4, 5, 6];
             }
 
             const baseDelay = isMobile ? 120 : 150;
             let totalDelay = 0;
             let msgIdx = 0;
 
-            cakeLayers.forEach((layer, layerIndex) => {
+            // 创建所有行，先添加到DOM中
+            const rows = [];
+            cakeLayers.forEach(() => {
                 const row = document.createElement('div');
                 row.className = 'popup-row';
                 popupContainer.appendChild(row);
+                rows.push(row);
+            });
 
-                for (let i = 0; i < layer.count && msgIdx < messages.length; i++) {
+            // 填充每一行的内容
+            cakeLayers.forEach((countInRow, rowIndex) => {
+                for (let i = 0; i < countInRow && msgIdx < messages.length; i++) {
                     const msg = messages[msgIdx];
                     const delay = totalDelay + i * baseDelay;
-                    const colorIndex = msgIdx % colors.length;
+                    const colorIdx = msgIdx % colors.length;
+                    const currentRow = rows[rowIndex];
 
                     setTimeout(() => {
                         const popup = document.createElement('div');
                         popup.className = 'popup';
                         popup.textContent = msg;
-                        popup.style.background = colors[colorIndex];
+                        popup.style.background = colors[colorIdx];
 
                         popup.addEventListener('click', () => {
-                            popup.style.transform = 'scale(0) translateY(30px)';
+                            popup.style.transform = 'scale(0) translateY(20px)';
                             popup.style.opacity = '0';
                             setTimeout(() => popup.remove(), 300);
 
@@ -1314,16 +1245,16 @@
                             }
                         });
 
-                        row.appendChild(popup);
+                        currentRow.appendChild(popup);
 
                         requestAnimationFrame(() => {
                             popup.classList.add('show');
                         });
                     }, delay);
-                    
+
                     msgIdx++;
                 }
-                totalDelay += layer.count * baseDelay + 50;
+                totalDelay += countInRow * baseDelay + 50;
             });
 
             setTimeout(() => {
