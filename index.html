@@ -226,20 +226,21 @@
         /* 手机端适配 */
         @media (max-width: 768px) {
             .popup-container {
-                gap: 8px;
+                gap: 12px;
             }
             
             .popup-row {
-                gap: 6px;
-                flex-wrap: wrap;
-                max-width: 92vw;
+                gap: 8px;
+                flex-wrap: nowrap;
+                justify-content: center;
             }
             
             .popup {
                 padding: 8px 10px;
                 font-size: 10px;
-                min-width: 60px;
-                max-width: 100px;
+                min-width: 55px;
+                max-width: 90px;
+                border-radius: 12px;
             }
         }
 
@@ -1152,7 +1153,7 @@
 
             setTimeout(() => {
                 showCaringPopups();
-            }, 42000);
+            }, 48000);
         }
 
         function showCaringPopups() {
@@ -1199,34 +1200,36 @@
             const screenWidth = window.innerWidth;
             const isMobile = screenWidth < 768;
 
-            // 根据屏幕大小设置蛋糕层数
+            // 蛋糕层: 从上到下，越来越宽
             let cakeLayers;
             if (isMobile) {
-                cakeLayers = [3, 4, 5, 5];
+                cakeLayers = [2, 3, 5, 7];
             } else {
                 cakeLayers = [2, 4, 5, 6];
             }
 
-            const baseDelay = isMobile ? 120 : 150;
+            const baseDelay = isMobile ? 100 : 150;
             let totalDelay = 0;
             let msgIdx = 0;
 
-            // 创建所有行，先添加到DOM中
+            // 创建所有行
             const rows = [];
-            cakeLayers.forEach(() => {
+            for (let i = 0; i < cakeLayers.length; i++) {
                 const row = document.createElement('div');
                 row.className = 'popup-row';
                 popupContainer.appendChild(row);
                 rows.push(row);
-            });
+            }
 
-            // 填充每一行的内容
-            cakeLayers.forEach((countInRow, rowIndex) => {
+            // 从顶层开始填充
+            for (let rowIdx = 0; rowIdx < cakeLayers.length && msgIdx < messages.length; rowIdx++) {
+                const countInRow = cakeLayers[rowIdx];
+                const currentRow = rows[rowIdx];
+
                 for (let i = 0; i < countInRow && msgIdx < messages.length; i++) {
                     const msg = messages[msgIdx];
                     const delay = totalDelay + i * baseDelay;
                     const colorIdx = msgIdx % colors.length;
-                    const currentRow = rows[rowIndex];
 
                     setTimeout(() => {
                         const popup = document.createElement('div');
@@ -1254,8 +1257,8 @@
 
                     msgIdx++;
                 }
-                totalDelay += countInRow * baseDelay + 50;
-            });
+                totalDelay += countInRow * baseDelay + 100;
+            }
 
             setTimeout(() => {
                 popupHint.classList.add('show');
