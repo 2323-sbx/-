@@ -674,15 +674,15 @@
                 
                 let baseSize;
                 if (canvas.width < 375) {
-                    baseSize = 3;
+                    baseSize = 5;
                 } else if (canvas.width < 480) {
-                    baseSize = 3.5;
+                    baseSize = 5.5;
                 } else if (canvas.width < 768) {
-                    baseSize = 4;
+                    baseSize = 6;
                 } else {
-                    baseSize = 4;
+                    baseSize = 6;
                 }
-                this.size = baseSize + Math.random() * 2;
+                this.size = baseSize + Math.random() * 1;
                 
                 this.alpha = 0;
                 this.targetAlpha = 1;
@@ -795,9 +795,9 @@
             
             let gap;
             if (canvas.width < 375) {
-                gap = 2;
+                gap = 3;
             } else if (canvas.width < 480) {
-                gap = 2.5;
+                gap = 3;
             } else if (canvas.width < 768) {
                 gap = 3;
             } else {
