@@ -29,17 +29,25 @@
                 padding: 18px 50px !important;
             }
             .countdown-number {
-                font-size: 120px !important;
+                font-size: 100px !important;
             }
             .flame {
                 width: 40px !important;
                 height: 80px !important;
-                top: -120px !important;
+                top: -90px !important;
             }
             .flame-glow {
                 width: 140px !important;
                 height: 140px !important;
-                top: -150px !important;
+                top: -120px !important;
+            }
+            .lightbulbs {
+                width: 200px !important;
+                height: 180px !important;
+            }
+            .bulb {
+                width: 18px !important;
+                height: 18px !important;
             }
         }
         
@@ -138,72 +146,89 @@
 
         .flame {
             position: absolute;
-            top: -180px;
-            width: 60px;
-            height: 120px;
-            background: linear-gradient(to top, #ff6b35 0%, #ffd700 30%, #fffacd 60%, #ffffff 100%);
+            top: -140px;
+            width: 70px;
+            height: 140px;
+            background: linear-gradient(to top, #ff4500 0%, #ff8c00 20%, #ffa500 40%, #ffd700 60%, #fffacd 80%, #ffffff 100%);
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
             transform: rotate(-5deg);
-            animation: flameFlicker 0.3s ease-in-out infinite alternate;
-            z-index: 2;
-            filter: blur(2px);
+            animation: flameFlicker 0.2s ease-in-out infinite alternate;
+            z-index: 10;
+            filter: blur(1px);
         }
 
         .flame::before {
             content: '';
             position: absolute;
-            top: 10px;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25px;
+            height: 40px;
+            background: linear-gradient(to top, #fffacd 0%, #ffffff 100%);
+            border-radius: 50%;
+            animation: flameInner 0.3s ease-in-out infinite alternate;
+        }
+
+        .flame::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
             left: 50%;
             transform: translateX(-50%);
             width: 20px;
-            height: 30px;
-            background: linear-gradient(to top, #fffacd 0%, #ffffff 100%);
+            height: 20px;
+            background: linear-gradient(to bottom, #8b4513 0%, #654321 100%);
             border-radius: 50%;
-            animation: flameInner 0.4s ease-in-out infinite alternate;
         }
 
         .flame-glow {
             position: absolute;
-            top: -220px;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 107, 53, 0.2) 40%, transparent 70%);
+            top: -180px;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.5) 0%, rgba(255, 140, 0, 0.3) 30%, rgba(255, 69, 0, 0.1) 60%, transparent 80%);
             border-radius: 50%;
-            animation: glowPulse 1.5s ease-in-out infinite;
-            z-index: 1;
+            animation: glowPulse 1s ease-in-out infinite;
+            z-index: 5;
         }
 
         @keyframes flameFlicker {
-            0% { transform: rotate(-5deg) scaleY(1); }
-            100% { transform: rotate(5deg) scaleY(1.05); }
+            0% { transform: rotate(-8deg) scaleY(1) scaleX(0.98); }
+            100% { transform: rotate(8deg) scaleY(1.05) scaleX(1.02); }
         }
 
         @keyframes flameInner {
-            0% { opacity: 0.8; transform: translateX(-50%) scale(1); }
-            100% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+            0% { opacity: 0.9; transform: translateX(-50%) scale(0.95); }
+            100% { opacity: 1; transform: translateX(-50%) scale(1.05); }
         }
 
         @keyframes glowPulse {
-            0%, 100% { opacity: 0.8; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
         }
 
         .countdown-number {
-            font-size: 220px;
-            color: #ffd700;
-            font-weight: bold;
-            letter-spacing: 20px;
-            background: linear-gradient(to bottom, #ffeb3b 0%, #ff9800 50%, #f57c00 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 
-                0 0 30px rgba(255, 215, 0, 0.8),
-                0 0 60px rgba(255, 165, 0, 0.5),
-                0 0 90px rgba(255, 100, 0, 0.3);
+            font-size: 200px;
+            font-weight: 900;
+            letter-spacing: 10px;
             position: relative;
-            z-index: 3;
-            animation: numberGlow 1s ease-in-out infinite alternate;
+            z-index: 6;
+            animation: numberGlow 2s ease-in-out infinite;
+        }
+
+        .countdown-number::before {
+            content: attr(id);
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: #ffeb3b;
+            text-shadow: 
+                0 0 10px #ffeb3b,
+                0 0 20px #ff9800,
+                0 0 30px #ff5722;
+            z-index: -1;
+            filter: blur(5px);
         }
 
         .countdown-number::after {
@@ -211,15 +236,52 @@
             position: absolute;
             top: 0;
             left: 0;
-            color: #ffd700;
-            opacity: 0.3;
-            filter: blur(10px);
-            z-index: -1;
+            color: #fff8dc;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background: linear-gradient(180deg, 
+                #fff8dc 0%, 
+                #ffd700 20%, 
+                #ffa500 40%, 
+                #ff8c00 60%, 
+                #ff6b35 80%, 
+                #e65c00 100%);
+            z-index: 1;
         }
 
         @keyframes numberGlow {
-            0% { filter: brightness(1); }
-            100% { filter: brightness(1.2); }
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 20px rgba(255, 215, 0, 0.6)); }
+            50% { filter: brightness(1.1) drop-shadow(0 0 30px rgba(255, 215, 0, 0.8)); }
+        }
+
+        .lightbulbs {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 280px;
+            z-index: 7;
+            pointer-events: none;
+        }
+
+        .bulb {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: #fff8dc;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 15px #ffd700,
+                0 0 30px #ffa500,
+                0 0 45px rgba(255, 140, 0, 0.5);
+            animation: bulbTwinkle 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bulbTwinkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
         }
         
         .fireworks-screen {
@@ -373,6 +435,7 @@
             <div class="candle-container">
                 <div class="flame"></div>
                 <div class="flame-glow"></div>
+                <div class="lightbulbs" id="lightbulbs"></div>
                 <div class="countdown-number" id="countdown">5</div>
             </div>
         </div>
@@ -1175,6 +1238,40 @@
             currentScreen = num;
         }
         
+        function createLightbulbs() {
+            const lightbulbsContainer = document.getElementById('lightbulbs');
+            if (!lightbulbsContainer) return;
+            
+            lightbulbsContainer.innerHTML = '';
+            
+            const bulbPositions = [
+                { top: '30px', left: '100px' },
+                { top: '50px', left: '160px' },
+                { top: '80px', left: '200px' },
+                { top: '120px', left: '220px' },
+                { top: '160px', left: '210px' },
+                { top: '200px', left: '180px' },
+                { top: '230px', left: '140px' },
+                { top: '240px', left: '100px' },
+                { top: '230px', left: '60px' },
+                { top: '200px', left: '20px' },
+                { top: '160px', left: '0px' },
+                { top: '120px', left: '-10px' },
+                { top: '80px', left: '0px' },
+                { top: '50px', left: '40px' },
+                { top: '30px', left: '100px' }
+            ];
+            
+            bulbPositions.forEach((pos, index) => {
+                const bulb = document.createElement('div');
+                bulb.className = 'bulb';
+                bulb.style.top = pos.top;
+                bulb.style.left = pos.left;
+                bulb.style.animationDelay = (index * 0.1) + 's';
+                lightbulbsContainer.appendChild(bulb);
+            });
+        }
+
         function startCountdown() {
             showMusicControls();
             
@@ -1185,6 +1282,8 @@
             }).catch(() => {
                 console.log('需要用户交互才能播放音乐');
             });
+            
+            createLightbulbs();
             
             let count = 5;
             const countdownEl = document.getElementById('countdown');
