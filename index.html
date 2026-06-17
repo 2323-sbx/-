@@ -28,26 +28,26 @@
                 font-size: 24px !important;
                 padding: 18px 50px !important;
             }
-            .countdown-number {
+            .candle-number {
                 font-size: 100px !important;
             }
             .flame {
-                width: 40px !important;
-                height: 80px !important;
-                top: -90px !important;
+                width: 30px !important;
+                height: 60px !important;
+                top: -70px !important;
             }
             .flame-glow {
-                width: 140px !important;
-                height: 140px !important;
-                top: -120px !important;
+                width: 110px !important;
+                height: 110px !important;
+                top: -90px !important;
             }
-            .lightbulbs {
-                width: 200px !important;
-                height: 180px !important;
+            .bulb-container {
+                width: 100px !important;
+                height: 160px !important;
             }
             .bulb {
-                width: 18px !important;
-                height: 18px !important;
+                width: 8px !important;
+                height: 8px !important;
             }
         }
         
@@ -144,144 +144,164 @@
             justify-content: center;
         }
 
+        .number-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
         .flame {
             position: absolute;
-            top: -140px;
-            width: 70px;
-            height: 140px;
-            background: linear-gradient(to top, #ff4500 0%, #ff8c00 20%, #ffa500 40%, #ffd700 60%, #fffacd 80%, #ffffff 100%);
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            transform: rotate(-5deg);
-            animation: flameFlicker 0.2s ease-in-out infinite alternate;
+            top: -120px;
+            width: 60px;
+            height: 110px;
+            background: linear-gradient(to top, 
+                #ff0000 0%, 
+                #ff4500 15%, 
+                #ff8c00 35%, 
+                #ffd700 55%, 
+                #fffacd 80%, 
+                #ffffff 100%);
+            border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
+            transform: rotate(-3deg);
+            animation: flameFlicker 0.15s ease-in-out infinite alternate;
             z-index: 10;
-            filter: blur(1px);
         }
 
         .flame::before {
             content: '';
             position: absolute;
-            top: 5px;
+            top: 8px;
             left: 50%;
             transform: translateX(-50%);
-            width: 25px;
-            height: 40px;
-            background: linear-gradient(to top, #fffacd 0%, #ffffff 100%);
+            width: 18px;
+            height: 30px;
+            background: linear-gradient(to top, #ffeb3b 0%, #fff 100%);
             border-radius: 50%;
-            animation: flameInner 0.3s ease-in-out infinite alternate;
+            animation: flameInner 0.2s ease-in-out infinite alternate;
         }
 
         .flame::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
-            width: 20px;
-            height: 20px;
-            background: linear-gradient(to bottom, #8b4513 0%, #654321 100%);
-            border-radius: 50%;
+            width: 10px;
+            height: 25px;
+            background: linear-gradient(to top, #ff6600 0%, #ff8c00 50%, transparent 100%);
+            border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+            filter: blur(3px);
         }
 
         .flame-glow {
             position: absolute;
-            top: -180px;
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.5) 0%, rgba(255, 140, 0, 0.3) 30%, rgba(255, 69, 0, 0.1) 60%, transparent 80%);
+            top: -160px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.6) 0%, rgba(255, 140, 0, 0.3) 40%, transparent 70%);
             border-radius: 50%;
-            animation: glowPulse 1s ease-in-out infinite;
+            animation: glowPulse 0.8s ease-in-out infinite;
             z-index: 5;
         }
 
         @keyframes flameFlicker {
-            0% { transform: rotate(-8deg) scaleY(1) scaleX(0.98); }
-            100% { transform: rotate(8deg) scaleY(1.05) scaleX(1.02); }
+            0% { transform: rotate(-5deg) scaleY(1) scaleX(0.95); }
+            100% { transform: rotate(5deg) scaleY(1.08) scaleX(1.05); }
         }
 
         @keyframes flameInner {
-            0% { opacity: 0.9; transform: translateX(-50%) scale(0.95); }
-            100% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+            0% { opacity: 0.7; transform: translateX(-50%) scale(0.9); }
+            100% { opacity: 1; transform: translateX(-50%) scale(1.1); }
         }
 
         @keyframes glowPulse {
-            0%, 100% { opacity: 0.7; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.08); }
         }
 
-        .countdown-number {
+        .candle-number {
+            position: relative;
             font-size: 200px;
             font-weight: 900;
-            letter-spacing: 10px;
-            position: relative;
-            z-index: 6;
-            animation: numberGlow 2s ease-in-out infinite;
-        }
-
-        .countdown-number::before {
-            content: attr(id);
-            position: absolute;
-            top: 0;
-            left: 0;
-            color: #ffeb3b;
+            line-height: 1;
+            color: #ffd700;
+            -webkit-text-stroke: 8px #ffa500;
             text-shadow: 
-                0 0 10px #ffeb3b,
-                0 0 20px #ff9800,
-                0 0 30px #ff5722;
-            z-index: -1;
-            filter: blur(5px);
+                0 0 30px rgba(255, 215, 0, 0.9),
+                0 0 60px rgba(255, 165, 0, 0.7);
+            z-index: 6;
+            animation: numberGlow 1.5s ease-in-out infinite;
+            font-family: 'Arial Black', 'Times New Roman', serif;
         }
 
-        .countdown-number::after {
-            content: attr(id);
+        .candle-number::before {
+            content: attr(data-num);
             position: absolute;
             top: 0;
             left: 0;
             color: #fff8dc;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            background: linear-gradient(180deg, 
-                #fff8dc 0%, 
-                #ffd700 20%, 
-                #ffa500 40%, 
-                #ff8c00 60%, 
-                #ff6b35 80%, 
-                #e65c00 100%);
-            z-index: 1;
+            -webkit-text-stroke: 0;
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 1;
         }
 
         @keyframes numberGlow {
-            0%, 100% { filter: brightness(1) drop-shadow(0 0 20px rgba(255, 215, 0, 0.6)); }
-            50% { filter: brightness(1.1) drop-shadow(0 0 30px rgba(255, 215, 0, 0.8)); }
+            0%, 100% { 
+                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.7));
+            }
+            50% { 
+                filter: drop-shadow(0 0 35px rgba(255, 215, 0, 1));
+            }
         }
 
-        .lightbulbs {
+        .bulb-container {
             position: absolute;
             top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            height: 280px;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 7;
             pointer-events: none;
         }
 
         .bulb {
             position: absolute;
-            width: 25px;
-            height: 25px;
-            background: #fff8dc;
+            width: 14px;
+            height: 14px;
+            background: #fffacd;
             border-radius: 50%;
             box-shadow: 
-                0 0 15px #ffd700,
-                0 0 30px #ffa500,
-                0 0 45px rgba(255, 140, 0, 0.5);
-            animation: bulbTwinkle 1.5s ease-in-out infinite;
+                0 0 8px #fffacd,
+                0 0 16px #ffd700,
+                0 0 24px #ffa500;
+            animation: bulbTwinkle 1.2s ease-in-out infinite;
         }
 
         @keyframes bulbTwinkle {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(0.95); }
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1); 
+                box-shadow: 0 0 8px #fffacd, 0 0 16px #ffd700, 0 0 24px #ffa500; 
+            }
+            50% { 
+                opacity: 0.9; 
+                transform: scale(0.95); 
+                box-shadow: 0 0 5px #fffacd, 0 0 10px #ffd700, 0 0 18px #ffa500; 
+            }
+        }
+
+        .star-decoration {
+            position: absolute;
+            font-size: 30px;
+            animation: starRotate 3s linear infinite;
+            z-index: 4;
+        }
+
+        @keyframes starRotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
         }
         
         .fireworks-screen {
@@ -435,8 +455,10 @@
             <div class="candle-container">
                 <div class="flame"></div>
                 <div class="flame-glow"></div>
-                <div class="lightbulbs" id="lightbulbs"></div>
-                <div class="countdown-number" id="countdown">5</div>
+                <div class="number-wrap">
+                    <div class="candle-number" id="countdown" data-num="1">1</div>
+                    <div class="bulb-container" id="bulbContainer"></div>
+                </div>
             </div>
         </div>
         
@@ -1239,27 +1261,32 @@
         }
         
         function createLightbulbs() {
-            const lightbulbsContainer = document.getElementById('lightbulbs');
-            if (!lightbulbsContainer) return;
+            const bulbContainer = document.getElementById('bulbContainer');
+            if (!bulbContainer) return;
             
-            lightbulbsContainer.innerHTML = '';
+            bulbContainer.innerHTML = '';
             
+            // 沿着"1"字形轮廓布置灯泡（使用百分比定位）
+            // "1"字形结构：顶部短斜钩 + 中间竖 + 底部横
             const bulbPositions = [
-                { top: '30px', left: '100px' },
-                { top: '50px', left: '160px' },
-                { top: '80px', left: '200px' },
-                { top: '120px', left: '220px' },
-                { top: '160px', left: '210px' },
-                { top: '200px', left: '180px' },
-                { top: '230px', left: '140px' },
-                { top: '240px', left: '100px' },
-                { top: '230px', left: '60px' },
-                { top: '200px', left: '20px' },
-                { top: '160px', left: '0px' },
-                { top: '120px', left: '-10px' },
-                { top: '80px', left: '0px' },
-                { top: '50px', left: '40px' },
-                { top: '30px', left: '100px' }
+                // 顶部斜钩（3个）- 沿斜线分布
+                { top: '5%', left: '55%' },
+                { top: '5%', left: '65%' },
+                { top: '5%', left: '75%' },
+                
+                // 中间竖线（5个）- 居中
+                { top: '15%', left: '65%' },
+                { top: '28%', left: '65%' },
+                { top: '41%', left: '65%' },
+                { top: '54%', left: '65%' },
+                { top: '67%', left: '65%' },
+                
+                // 底部横线（5个）- 全宽
+                { top: '88%', left: '15%' },
+                { top: '88%', left: '30%' },
+                { top: '88%', left: '45%' },
+                { top: '88%', left: '60%' },
+                { top: '88%', left: '75%' }
             ];
             
             bulbPositions.forEach((pos, index) => {
@@ -1268,7 +1295,7 @@
                 bulb.style.top = pos.top;
                 bulb.style.left = pos.left;
                 bulb.style.animationDelay = (index * 0.1) + 's';
-                lightbulbsContainer.appendChild(bulb);
+                bulbContainer.appendChild(bulb);
             });
         }
 
@@ -1288,6 +1315,7 @@
             let count = 5;
             const countdownEl = document.getElementById('countdown');
             countdownEl.textContent = count;
+            countdownEl.setAttribute('data-num', count);
             countdownEl.style.opacity = '1';
             showScreen(2);
             
@@ -1295,6 +1323,7 @@
                 count--;
                 if (count >= 0) {
                     countdownEl.textContent = count;
+                    countdownEl.setAttribute('data-num', count);
                 }
                 
                 if (count < 0) {
